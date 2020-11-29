@@ -3,7 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MekSweeper.UI.App", "MekSweeper.UI.App\MekSweeper.UI.App.csproj", "{996BE19D-4082-4121-98EF-9F198DE080C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MekSweeper.UI.App", "MekSweeper.UI.App\MekSweeper.UI.App.csproj", "{996BE19D-4082-4121-98EF-9F198DE080C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MekSweeper.Game", "MekSweeper.Game\MekSweeper.Game.csproj", "{E08A83A7-E199-4459-895D-CC162D5D120B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MekSweeper.Logging", "MekSweeper.Logging\MekSweeper.Logging.csproj", "{94460A97-3A90-4420-86F5-7FC85E3CADA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MekSweeper.Logging.Interfaces", "MekSweeper.Logging.Interfaces\MekSweeper.Logging.Interfaces.csproj", "{E8D6B1F8-5740-49F7-8199-F53BA9BC86A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MekSweeper.Extensions", "MekSweeper.Extensions\MekSweeper.Extensions.csproj", "{AB1A8FC3-F25A-4668-A81C-97D9EDCE1AFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0EDBC294-CA58-44DA-87F4-9DBEE8B076F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MekSweeper.Extensions.Tests", "Tests\MekSweeper.Extensions.Tests\MekSweeper.Extensions.Tests.csproj", "{1ED16123-D710-4116-838A-BA0BB1DB4E09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +27,32 @@ Global
 		{996BE19D-4082-4121-98EF-9F198DE080C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{996BE19D-4082-4121-98EF-9F198DE080C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{996BE19D-4082-4121-98EF-9F198DE080C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E08A83A7-E199-4459-895D-CC162D5D120B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E08A83A7-E199-4459-895D-CC162D5D120B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E08A83A7-E199-4459-895D-CC162D5D120B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E08A83A7-E199-4459-895D-CC162D5D120B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94460A97-3A90-4420-86F5-7FC85E3CADA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94460A97-3A90-4420-86F5-7FC85E3CADA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94460A97-3A90-4420-86F5-7FC85E3CADA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94460A97-3A90-4420-86F5-7FC85E3CADA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8D6B1F8-5740-49F7-8199-F53BA9BC86A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8D6B1F8-5740-49F7-8199-F53BA9BC86A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8D6B1F8-5740-49F7-8199-F53BA9BC86A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8D6B1F8-5740-49F7-8199-F53BA9BC86A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB1A8FC3-F25A-4668-A81C-97D9EDCE1AFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB1A8FC3-F25A-4668-A81C-97D9EDCE1AFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB1A8FC3-F25A-4668-A81C-97D9EDCE1AFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB1A8FC3-F25A-4668-A81C-97D9EDCE1AFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1ED16123-D710-4116-838A-BA0BB1DB4E09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1ED16123-D710-4116-838A-BA0BB1DB4E09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1ED16123-D710-4116-838A-BA0BB1DB4E09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1ED16123-D710-4116-838A-BA0BB1DB4E09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1ED16123-D710-4116-838A-BA0BB1DB4E09} = {0EDBC294-CA58-44DA-87F4-9DBEE8B076F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A0B7A1DC-B6EC-405B-AA1B-D4A97ED68180}
