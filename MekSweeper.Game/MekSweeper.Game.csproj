@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MekSweeper.Extensions\MekSweeper.Extensions.csproj" />
     <ProjectReference Include="..\MekSweeper.Logging.Interfaces\MekSweeper.Logging.Interfaces.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Data;
+using System.Linq;
+using MekSweeper.Extensions;
 using MekSweeper.Logging.Interfaces;
 
 namespace MekSweeper.Game
@@ -57,7 +58,11 @@ namespace MekSweeper.Game
                     }
                     else
                     {
-
+                        int neighborMineCount = GetNeighboringMineCount(x, y, mines);
+                        cells[x, y] = new EmptyCell
+                        {
+                            NeighboringMineCount = neighborMineCount
+                        };
                     }
                 }
             }
@@ -67,7 +72,22 @@ namespace MekSweeper.Game
 
         private int GetNeighboringMineCount(int col, int row, bool[,] mines)
         {
+            var neighborMines = new []
+            {
+                mines.TryGetTop(col, row, out var top) && top,
+                mines.TryGetTopLeft(col, row, out var topLeft) && topLeft,
+                mines.TryGetTopRight(col, row, out var topRight) && topRight,
 
+                mines.TryGetLeft(col, row, out var left) && left,
+                mines.TryGetRight(col, row, out var right) && right,
+
+                mines.TryGetBottom(col, row, out var bottom) && bottom,
+                mines.TryGetBottomLeft(col, row, out var bottomLeft) && bottomLeft,
+                mines.TryGetBottomRight(col, row, out var bottomRight) && bottomRight,
+
+            };
+
+            return neighborMines.Count(m => m);
         }
 
         private bool[,] SetMines(BoardOptions options)
