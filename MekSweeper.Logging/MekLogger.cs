@@ -97,6 +97,7 @@ namespace MekSweeper.Logging
         {
             var messageTags = new List<(string, object)>
             {
+                ("module", _module),
                 ("message", message), 
                 ("moduleId", _moduleId)
             };

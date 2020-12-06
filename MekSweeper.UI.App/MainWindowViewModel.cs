@@ -28,8 +28,9 @@ namespace MekSweeper.UI.App
             UncoverCellCommand = new Command(UncoverCell);
             FlagCellCommand = new Command(FlagCell);
 
-            MessageContent = "Click 'New Game' to begin";
             _gameState = GameState.NotStarted;
+
+            NewGame();
         }
 
         #region Commands
