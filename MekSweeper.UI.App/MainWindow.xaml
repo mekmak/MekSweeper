@@ -9,11 +9,16 @@
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <DataTemplate x:Key="DataTemplateLevel2">
-            <Button Content="{Binding}" Height="40" Width="50" Margin="4,4,4,4"/>
+            <Button Content="{Binding Display}"
+                    Click="OnClick"
+                    MouseRightButtonUp="OnRightClick"
+                    Height="40" 
+                    Width="50" 
+                    Margin="4,4,4,4"/>
         </DataTemplate>
 
         <DataTemplate x:Key="DataTemplateLevel1">
-            <ItemsControl ItemsSource="{Binding}" ItemTemplate="{DynamicResource DataTemplateLevel2}">
+            <ItemsControl ItemsSource="{Binding }" ItemTemplate="{DynamicResource DataTemplateLevel2}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
@@ -24,6 +29,19 @@
 
     </Window.Resources>
     <Grid>
-        <ItemsControl ItemTemplate="{DynamicResource DataTemplateLevel1}"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Margin="2" Grid.Column="0" Content="New Game" Command="{Binding NewGameCommand}"/>
+            <Label Margin="2" Grid.Column="1" Content="{Binding MessageContent}"/>
+        </Grid>
+        
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Cells}" ItemTemplate="{DynamicResource DataTemplateLevel1}"/>
     </Grid>
 </Window>

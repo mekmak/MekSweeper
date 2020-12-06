@@ -6,4 +6,9 @@
     <OutputType>WinExe</OutputType>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MekSweeper.Game\MekSweeper.Game.csproj" />
+    <ProjectReference Include="..\MekSweeper.Logging\MekSweeper.Logging.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MekSweeper.Extensions;
 using MekSweeper.Logging.Interfaces;
 
@@ -27,71 +28,76 @@ namespace MekSweeper.Logging
             return new MekLogger(_moduleId, $"{_module}.{module}");
         }
 
+        public IMekLogger ForkLogger(string module)
+        {
+            return new MekLogger(_moduleId, module);
+        }
+
         public object Wrap(object value)
         {
             return $"[{value}]";
         }
 
-        public void Trace(string method, params (string, object)[] tags)
+        public void Trace(string message, params (string, object)[] tags)
         {
-            Trace(null, method, tags);
+            Trace(null, message, tags);
         }
 
-        public void Trace(string traceId, string method, params (string, object)[] tags)
+        public void Trace(string traceId, string message, params (string, object)[] tags)
         {
-            Log4NetLogger.Trace(BuildMessage(traceId, method, null, false, tags));
+            Log4NetLogger.Trace(BuildMessage(traceId, message, null, false, tags));
         }
 
-        public void Info(string method, params (string, object)[] tags)
+        public void Info(string message, params (string, object)[] tags)
         {
-            Info(null, method, tags);
+            Info(null, message, tags);
         }
 
-        public void Info(string traceId, string method, params (string, object)[] tags)
+        public void Info(string traceId, string message, params (string, object)[] tags)
         {
-            Info(traceId, method, null, tags);
+            Info(traceId, message, null, tags);
         }
 
-        public void Info(string traceId, string method, Exception ex, params (string, object)[] tags)
+        public void Info(string traceId, string message, Exception ex, params (string, object)[] tags)
         {
-            Log4NetLogger.Info(BuildMessage(traceId, method, ex, false, tags));
+            Log4NetLogger.Info(BuildMessage(traceId, message, ex, false, tags));
         }
 
-        public void Warn(string method, params (string, object)[] tags)
+        public void Warn(string message, params (string, object)[] tags)
         {
-            Warn(null, method, tags);
+            Warn(null, message, tags);
         }
 
-        public void Warn(string traceId, string method, params (string, object)[] tags)
+        public void Warn(string traceId, string message, params (string, object)[] tags)
         {
-            Warn(traceId, method, null, tags);
+            Warn(traceId, message, null, tags);
         }
 
-        public void Warn(string traceId, string method, Exception ex, params (string, object)[] tags)
+        public void Warn(string traceId, string message, Exception ex, params (string, object)[] tags)
         {
-            Log4NetLogger.Warn(BuildMessage(traceId, method, ex, false, tags));
+            Log4NetLogger.Warn(BuildMessage(traceId, message, ex, false, tags));
         }
 
-        public void Error(string method, params (string, object)[] tags)
+        public void Error(string message, params (string, object)[] tags)
         {
-            Error(null, method, tags);
+            Error(null, message, tags);
         }
 
-        public void Error(string traceId, string method, params (string, object)[] tags)
+        public void Error(string traceId, string message, params (string, object)[] tags)
         {
-            Error(traceId, method, null, tags);
+            Error(traceId, message, null, tags);
         }
 
-        public void Error(string traceId, string method, Exception ex, params (string, object)[] tags)
+        public void Error(string traceId, string message, Exception ex, params (string, object)[] tags)
         {
-            Log4NetLogger.Error(BuildMessage(traceId, method, ex, true, tags));
+            Log4NetLogger.Error(BuildMessage(traceId, message, ex, true, tags));
         }
 
-        private string BuildMessage(string traceId, string method, Exception ex, bool writeFullStackTrace, params (string, object)[] tags)
+        private string BuildMessage(string traceId, string message, Exception ex, bool writeFullStackTrace, params (string, object)[] tags)
         {
             var messageTags = new List<(string, object)>
             {
-                ("method", method), 
+                ("message", message), 
                 ("moduleId", _moduleId)
             };
 
@@ -107,7 +113,7 @@ namespace MekSweeper.Logging
                 messageTags.Add(("exception", Wrap(writeFullStackTrace ? ex.FullSummary() : ex.ShortSummary())));
             }
 
-            return string.Join(", ", messageTags);
+            return string.Join(", ", messageTags.Select(tuple => $"{tuple.Item1}={tuple.Item2}"));
         }
 
         private string NewModuleId()

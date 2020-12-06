@@ -13,7 +13,7 @@ namespace MekSweeper.Game
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Board Build(string traceId, IMekLogger boardLogger, BoardOptions options)
+        public Board Build(string traceId, BoardOptions options)
         {
             if (options == null)
             {
@@ -45,6 +45,8 @@ namespace MekSweeper.Game
                 throw new ArgumentException("Cannot have more mines than cells");
             }
 
+            _logger.Info(traceId, "Build", ("rowCount", options.RowCount), ("columnCount", options.ColumnCount), ("mineCount", options.MineCount));
+
             var cells = new Cell[options.ColumnCount, options.RowCount];
             var mines = SetMines(options);
 
@@ -67,27 +69,12 @@ namespace MekSweeper.Game
                 }
             }
 
-            return new Board(boardLogger, cells);
+            return new Board(_logger.ForkLogger("Board"), cells);
         }
 
         private int GetNeighboringMineCount(int col, int row, bool[,] mines)
         {
-            var neighborMines = new []
-            {
-                mines.TryGetTop(col, row, out var top) && top,
-                mines.TryGetTopLeft(col, row, out var topLeft) && topLeft,
-                mines.TryGetTopRight(col, row, out var topRight) && topRight,
-
-                mines.TryGetLeft(col, row, out var left) && left,
-                mines.TryGetRight(col, row, out var right) && right,
-
-                mines.TryGetBottom(col, row, out var bottom) && bottom,
-                mines.TryGetBottomLeft(col, row, out var bottomLeft) && bottomLeft,
-                mines.TryGetBottomRight(col, row, out var bottomRight) && bottomRight,
-
-            };
-
-            return neighborMines.Count(m => m);
+            return mines.GetNeighbors(col, row).Count(m => m);
         }
 
         private bool[,] SetMines(BoardOptions options)

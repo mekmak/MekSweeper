@@ -8,8 +8,8 @@ namespace MekSweeper.Game
 {
     public class BoardOptions
     {
-        public int RowCount { get; init; }
-        public int ColumnCount { get; init; }
-        public int MineCount { get; init; }
+        public int RowCount { get; set; }
+        public int ColumnCount { get; set; }
+        public int MineCount { get; set; }
     }
 }

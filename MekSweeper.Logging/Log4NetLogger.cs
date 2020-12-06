@@ -23,7 +23,7 @@ namespace MekSweeper.Logging
             RollingFileAppender roller = new RollingFileAppender
             {
                 AppendToFile = false,
-                File = @"Logs\MekLogs.txt",
+                File = @"Logs\MekSweeperLogs.txt",
                 Layout = patternLayout,
                 MaxSizeRollBackups = 5,
                 MaximumFileSize = "1GB",
