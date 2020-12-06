@@ -3,18 +3,107 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MekSweeper.UI.App"
         d:DataContext="local:MainWindowViewModel"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <DataTemplate x:Key="DataTemplateLevel2">
-            <Button Content="{Binding Display}"
-                    Click="OnClick"
-                    MouseRightButtonUp="OnRightClick"
-                    Height="40" 
-                    Width="50" 
-                    Margin="4,4,4,4"/>
+            <Button Content="{Binding Display}" FontWeight="Bold" Click="OnClick" MouseRightButtonUp="OnRightClick" Height="40" Width="50" Margin="0">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding FlagState}" Value="0">
+                                <Setter Property="Background" Value="LightGray"/>
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding FlagState}" Value="2">
+                                <Setter Property="Background" Value="LightGray"/>
+                            </DataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsMine}" Value="False"/>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="0"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="Gray"/>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="1"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Blue"></Setter>
+                                <Setter Property="Background" Value="LightGray"/>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="2"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Green"></Setter>
+                                <Setter Property="Background" Value="LightGray"/>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="3"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Red"></Setter>
+                                <Setter Property="Background" Value="LightGray"/>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="4"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Purple"></Setter>
+                                <Setter Property="Background" Value="LightGray"/>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="5"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Brown"></Setter>
+                                <Setter Property="Background" Value="LightGray"/>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="6"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Teal"></Setter>
+                                <Setter Property="Background" Value="LightGray"/>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="7"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Black"></Setter>
+                                <Setter Property="Background" Value="LightGray"/>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="8"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Orange"></Setter>
+                                <Setter Property="Background" Value="LightGray"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </DataTemplate>
 
         <DataTemplate x:Key="DataTemplateLevel1">
@@ -42,6 +131,6 @@
             <Label Margin="2" Grid.Column="1" Content="{Binding MessageContent}"/>
         </Grid>
         
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding Cells}" ItemTemplate="{DynamicResource DataTemplateLevel1}"/>
+        <ItemsControl Margin="2" Grid.Row="1" ItemsSource="{Binding Cells}" ItemTemplate="{DynamicResource DataTemplateLevel1}"/>
     </Grid>
 </Window>

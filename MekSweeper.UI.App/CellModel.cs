@@ -34,8 +34,10 @@ namespace MekSweeper.UI.App
                         return "";
                     case CellFlagState.Flagged:
                         return "F";
-                    case CellFlagState.Uncovered:
+                    case CellFlagState.Uncovered when NeighboringMineCount != 0:
                         return IsMine ? "X" : NeighboringMineCount.ToString();
+                    case CellFlagState.Uncovered when NeighboringMineCount == 0:
+                        return IsMine ? "X" : "";
                     default:
                         return "?";
                 }
