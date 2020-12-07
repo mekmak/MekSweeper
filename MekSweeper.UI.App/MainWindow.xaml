@@ -8,7 +8,7 @@
         Title="MekSweeper" Width="Auto" Height="Auto" SizeToContent="WidthAndHeight">
     <Window.Resources>
         <DataTemplate x:Key="DataTemplateLevel2">
-            <Button Content="{Binding Display}" FontWeight="Bold" Click="OnClick" MouseRightButtonUp="OnRightClick" Height="30" Width="30" Margin="0">
+            <Button Content="{Binding Display}" FontWeight="Bold" Click="OnClick" MouseUp="UIElement_OnMouseUp" Height="30" Width="30" Margin="0">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Style.Triggers>

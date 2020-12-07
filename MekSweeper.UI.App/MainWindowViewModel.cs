@@ -27,6 +27,7 @@ namespace MekSweeper.UI.App
             NewGameCommand = new Command(NewGame);
             UncoverCellCommand = new Command(UncoverCell);
             FlagCellCommand = new Command(FlagCell);
+            RevealKnownCommand = new Command(RevealKnown);
 
             DifficultyTiers = new List<DifficultyTier>
             {
@@ -64,6 +65,14 @@ namespace MekSweeper.UI.App
         {
             get => _flagCellCommand;
             set => SetProperty(nameof(FlagCellCommand), ref _flagCellCommand, ref value);
+        }
+
+        private Command _revealKnownCommand;
+
+        public Command RevealKnownCommand
+        {
+            get => _revealKnownCommand;
+            set => SetProperty(nameof(RevealKnownCommand), ref _revealKnownCommand, ref value);
         }
 
         #endregion
@@ -254,6 +263,43 @@ namespace MekSweeper.UI.App
             throw new InvalidOperationException($"Unrecognized cell type '{cell.GetType().Name}'");
         }
 
+        private void RevealKnown(object cellObj)
+        {
+            if (_gameState != GameState.InProgress)
+            {
+                return;
+            }
+
+            var cell = cellObj as CellModel;
+            if (cell == null)
+            {
+                _logger.Warn(_traceId, "RevealKnown.CannotCast", ("objectType", cellObj?.GetType().Name));
+                return;
+            }
+
+            if (cell.FlagState != CellFlagState.Uncovered)
+            {
+                return;
+            }
+
+            List<CellModel> neighbors = _cells.GetNeighbors(cell.X, cell.Y).ToList();
+            List<CellModel> flagged = neighbors.Where(n => n.FlagState == CellFlagState.Flagged).ToList();
+            List<CellModel> unrevealed = neighbors.Where(n => n.FlagState == CellFlagState.Blank).ToList();
+
+            if (flagged.Count != cell.NeighboringMineCount)
+            {
+                return;
+            }
+
+            foreach (CellModel unrevealedCell in unrevealed)
+            {
+                if (UncoverCell(unrevealedCell))
+                {
+                    return;
+                }
+            }
+        }
+
         private void FlagCell(object cellObj)
         {
             if (_gameState != GameState.InProgress)
@@ -305,17 +351,25 @@ namespace MekSweeper.UI.App
                 return;
             }
 
+            UncoverCell(cell);
+        }
+
+        /// <summary>
+        /// Returns true if the uncovering this cell ends the game, false otherwise
+        /// </summary>
+        private bool UncoverCell(CellModel cell)
+        {
             _logger.Info(_traceId, "UncoverCell", cell.LogTags().ToArray());
 
             if (cell.FlagState != CellFlagState.Blank)
             {
-                return;
+                return false;
             }
 
             if (cell.IsMine)
             {
                 EndGame(GameState.Lost);
-                return;
+                return true;
             }
 
             cell.FlagState = CellFlagState.Uncovered;
@@ -324,7 +378,7 @@ namespace MekSweeper.UI.App
                 ChainUncoverZeroCells(cell);
             }
 
-            UpdateGameState();
+            return UpdateGameState();;
         }
 
         private void ChainUncoverZeroCells(CellModel cell)
@@ -352,7 +406,7 @@ namespace MekSweeper.UI.App
             }
         }
 
-        private void UpdateGameState()
+        private bool UpdateGameState()
         {
             int totalCellCount = 0;
             int totalMineCount = 0;
@@ -384,10 +438,11 @@ namespace MekSweeper.UI.App
             if (allMinesFlagged && allCellsUncovered)
             {
                 EndGame(GameState.Won);
-                return;
+                return true;
             }
 
             MessageContent = $"Mines left: {totalMineCount - totalFlaggedCount}";
+            return false;
         }
 
         private void EndGame(GameState endState)

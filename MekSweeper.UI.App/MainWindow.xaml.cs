@@ -29,5 +29,27 @@ namespace MekSweeper.UI.App
             var button = (Button) sender;
             ViewModel.UncoverCellCommand.Execute(button.DataContext);
         }
+
+        private void UIElement_OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ButtonState != MouseButtonState.Released)
+            {
+                return;
+            }
+
+            var button = (Button) sender;
+            switch (e.ChangedButton)
+            {
+                case MouseButton.Left:
+                    ViewModel.UncoverCellCommand.Execute(button.DataContext);
+                    break;
+                case MouseButton.Right:
+                    ViewModel.FlagCellCommand.Execute(button.DataContext);
+                    break;
+                case MouseButton.Middle:
+                    ViewModel.RevealKnownCommand.Execute(button.DataContext);
+                    break;
+            }
+        }
     }
 }
