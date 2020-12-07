@@ -13,7 +13,7 @@ namespace MekSweeper.Game
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Board Build(string traceId, BoardOptions options)
+        public Cell[,] Build(string traceId, BoardOptions options)
         {
             if (options == null)
             {
@@ -69,7 +69,7 @@ namespace MekSweeper.Game
                 }
             }
 
-            return new Board(_logger.ForkLogger("Board"), cells);
+            return cells;
         }
 
         private int GetNeighboringMineCount(int col, int row, bool[,] mines)
@@ -79,18 +79,18 @@ namespace MekSweeper.Game
 
         private bool[,] SetMines(BoardOptions options)
         {
-            var mines = new bool[options.RowCount, options.ColumnCount];
+            var mines = new bool[options.ColumnCount, options.RowCount];
 
             int minesPlaced = 0;
             while (minesPlaced < options.MineCount)
             {
-                (int row, int col) = GetRandomCell(options);
-                if (mines[row, col])
+                (int col, int row) = GetRandomCell(options);
+                if (mines[col, row])
                 {
                     continue;
                 }
 
-                mines[row, col] = true;
+                mines[col, row] = true;
                 minesPlaced++;
             }
 

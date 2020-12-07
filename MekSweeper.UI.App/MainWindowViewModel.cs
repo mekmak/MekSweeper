@@ -28,6 +28,16 @@ namespace MekSweeper.UI.App
             UncoverCellCommand = new Command(UncoverCell);
             FlagCellCommand = new Command(FlagCell);
 
+            DifficultyTiers = new List<DifficultyTier>
+            {
+                DifficultyTier.Easy,
+                DifficultyTier.Medium,
+                DifficultyTier.Hard,
+                DifficultyTier.Custom
+            };
+
+            SelectedDifficulty = DifficultyTier.Hard;
+
             _gameState = GameState.NotStarted;
 
             NewGame();
@@ -62,6 +72,52 @@ namespace MekSweeper.UI.App
 
         private GameState _gameState;
 
+        private DifficultyTier _selectedDifficulty;
+        public DifficultyTier SelectedDifficulty
+        {
+            get => _selectedDifficulty;
+            set
+            {
+                SetProperty(nameof(SelectedDifficulty), ref _selectedDifficulty, ref value);
+                OnDifficultyTierChanged();
+            }
+        }
+
+        public List<DifficultyTier> DifficultyTiers { get; set; }
+
+        private int _numberOfRows;
+        public int NumberOfRows
+        {
+            get => _numberOfRows;
+            set
+            {
+                SetProperty(nameof(NumberOfRows), ref _numberOfRows, ref value);
+                OnNumberOfRowsChanged();
+            }
+        }
+
+        private int _numberOfColumns;
+        public int NumberOfColumns
+        {
+            get => _numberOfColumns;
+            set
+            {
+                SetProperty(nameof(NumberOfColumns), ref _numberOfColumns, ref value);
+                OnNumberOfColumnsChanged();
+            }
+        }
+
+        private int _numberOfMines;
+        public int NumberOfMines
+        {
+            get => _numberOfMines;
+            set
+            {
+                SetProperty(nameof(NumberOfMines), ref _numberOfMines, ref value);
+                OnNumberOfMinesChanged();
+            }
+        }
+
         private string _messageContent;
         public string MessageContent
         {
@@ -78,27 +134,85 @@ namespace MekSweeper.UI.App
 
         #endregion
 
+        private void OnDifficultyTierChanged()
+        {
+            switch (_selectedDifficulty)
+            {
+                case DifficultyTier.Easy:
+                    _numberOfMines = 10;
+                    _numberOfColumns = 10;
+                    _numberOfRows = 10;
+                    break;
+                case DifficultyTier.Medium:
+                    _numberOfMines = 40;
+                    _numberOfColumns = 16;
+                    _numberOfRows = 16;
+                    break;
+                case DifficultyTier.Hard:
+                    _numberOfMines = 99;
+                    _numberOfColumns = 30;
+                    _numberOfRows = 16;
+                    break;
+                case DifficultyTier.Custom:
+                    break;
+                default:
+                    _logger.Warn(_traceId, "OnDifficultyTierChanged.UnrecognizedDifficulty", ("tier", _selectedDifficulty));
+                    break;
+            }
+
+            OnPropertyChanged(nameof(NumberOfMines));
+            OnPropertyChanged(nameof(NumberOfColumns));
+            OnPropertyChanged(nameof(NumberOfRows));
+        }
+
+        private void OnNumberOfMinesChanged()
+        {
+            SelectedDifficulty = DifficultyTier.Custom;
+        }
+
+        private void OnNumberOfColumnsChanged()
+        {
+            SelectedDifficulty = DifficultyTier.Custom;
+        }
+
+        private void OnNumberOfRowsChanged()
+        {
+            SelectedDifficulty = DifficultyTier.Custom;
+        }
+
         private void NewGame()
         {
             _logger.Info(_traceId, "NewGame");
+
             var options = new BoardOptions
             {
-                RowCount = 10,
-                ColumnCount = 10,
-                MineCount = 10
+                // This is not a mistake
+                ColumnCount = NumberOfRows,
+                RowCount = NumberOfColumns,
+                MineCount = NumberOfMines
             };
 
-            Board newBoard = _boardBuilder.Build(_traceId, options);
-
-            var cells = new List<List<CellModel>>(newBoard.ColumnCount);
-            for (int x = 0; x < newBoard.ColumnCount; x++)
+            List<List<CellModel>> cells;
+            try
             {
-                cells.Add(new List<CellModel>(newBoard.RowCount));
-                for (int y = 0; y < newBoard.RowCount; y++)
+                Cell[,] newBoard = _boardBuilder.Build(_traceId, options);
+
+                cells = new List<List<CellModel>>(options.ColumnCount);
+                for (int x = 0; x < options.ColumnCount; x++)
                 {
-                    Cell cell = newBoard.GetCell(_traceId, x, y);
-                    cells[x].Add(FromCell(x, y, cell));
+                    cells.Add(new List<CellModel>(options.RowCount));
+                    for (int y = 0; y < options.RowCount; y++)
+                    {
+                        Cell cell = newBoard[x, y];
+                        cells[x].Add(FromCell(x, y, cell));
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                _gameState = GameState.NotStarted;
+                MessageContent = $"Game setup issue: {ex.ShortSummary()}";
+                return;
             }
 
             Cells = cells;
@@ -279,6 +393,8 @@ namespace MekSweeper.UI.App
         private void EndGame(GameState endState)
         {
             _logger.Info(_traceId, "EndGame", ("endState", endState));
+
+            _gameState = endState;
             foreach (CellModel cell in _cells.SelectMany(c => c))
             {
                 cell.FlagState = CellFlagState.Uncovered;
@@ -307,6 +423,14 @@ namespace MekSweeper.UI.App
             InProgress,
             Lost,
             Won
+        }
+
+        public enum DifficultyTier
+        {
+            Easy,
+            Medium,
+            Hard,
+            Custom
         }
     }
 }
