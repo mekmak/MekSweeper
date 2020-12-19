@@ -3,23 +3,100 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:app="clr-namespace:MekSweeper.UI.App"
         d:DataContext="local:MainWindowViewModel"
         mc:Ignorable="d" Background="Black"
         Title="MekSweeper" Width="Auto" Height="Auto" SizeToContent="WidthAndHeight">
     <Window.Resources>
-        <DataTemplate x:Key="DataTemplateLevel2">
-            <Button Content="{Binding Display}" FontWeight="Bold" Click="OnClick" MouseUp="UIElement_OnMouseUp" Height="30" Width="30" Margin="0">
+
+        <DataTemplate x:Key="EndGameCellTemplate">
+            <Button DataContext="{Binding}" Content="{Binding EndGameDisplay}" Click="OnClick" MouseUp="UIElement_OnMouseUp" Height="30" Width="30" Margin="0">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Background" Value="LightGray"/>
                         <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsMine}" Value="False"/>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="0"/>
+                                    <Condition Binding="{Binding FlagState}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="Gray"/>
+                            </MultiDataTrigger>
+
                             <DataTrigger Binding="{Binding FlagState}" Value="0">
-                                <Setter Property="Background" Value="LightGray"/>
+                                <Setter Property="Background" Value="DarkGray"/>
                             </DataTrigger>
 
-                            <DataTrigger Binding="{Binding FlagState}" Value="2">
-                                <Setter Property="Background" Value="LightGray"/>
-                            </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Blue"></Setter>
+                            </MultiDataTrigger>
 
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="2"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Green"></Setter>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="3"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Red"></Setter>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="4"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Purple"></Setter>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="5"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Brown"></Setter>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="6"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Teal"></Setter>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="7"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Black"></Setter>
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding NeighboringMineCount}" Value="8"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Foreground" Value="Orange"></Setter>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </DataTemplate>
+
+        <DataTemplate x:Key="InProgressCellTemplate">
+            <Button DataContext="{Binding}" Content="{Binding InProgressDisplay}" Click="OnClick" MouseUp="UIElement_OnMouseUp" Height="30" Width="30" Margin="0">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Background" Value="LightGray"/>
+                        <Style.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsMine}" Value="False"/>
@@ -35,7 +112,6 @@
                                     <Condition Binding="{Binding FlagState}" Value="1"/>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Foreground" Value="Blue"></Setter>
-                                <Setter Property="Background" Value="LightGray"/>
                             </MultiDataTrigger>
 
                             <MultiDataTrigger>
@@ -44,7 +120,6 @@
                                     <Condition Binding="{Binding FlagState}" Value="1"/>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Foreground" Value="Green"></Setter>
-                                <Setter Property="Background" Value="LightGray"/>
                             </MultiDataTrigger>
 
                             <MultiDataTrigger>
@@ -53,7 +128,6 @@
                                     <Condition Binding="{Binding FlagState}" Value="1"/>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Foreground" Value="Red"></Setter>
-                                <Setter Property="Background" Value="LightGray"/>
                             </MultiDataTrigger>
 
                             <MultiDataTrigger>
@@ -62,7 +136,6 @@
                                     <Condition Binding="{Binding FlagState}" Value="1"/>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Foreground" Value="Purple"></Setter>
-                                <Setter Property="Background" Value="LightGray"/>
                             </MultiDataTrigger>
 
                             <MultiDataTrigger>
@@ -71,7 +144,6 @@
                                     <Condition Binding="{Binding FlagState}" Value="1"/>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Foreground" Value="Brown"></Setter>
-                                <Setter Property="Background" Value="LightGray"/>
                             </MultiDataTrigger>
 
                             <MultiDataTrigger>
@@ -80,7 +152,6 @@
                                     <Condition Binding="{Binding FlagState}" Value="1"/>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Foreground" Value="Teal"></Setter>
-                                <Setter Property="Background" Value="LightGray"/>
                             </MultiDataTrigger>
 
                             <MultiDataTrigger>
@@ -89,7 +160,6 @@
                                     <Condition Binding="{Binding FlagState}" Value="1"/>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Foreground" Value="Black"></Setter>
-                                <Setter Property="Background" Value="LightGray"/>
                             </MultiDataTrigger>
 
                             <MultiDataTrigger>
@@ -98,22 +168,44 @@
                                     <Condition Binding="{Binding FlagState}" Value="1"/>
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Foreground" Value="Orange"></Setter>
-                                <Setter Property="Background" Value="LightGray"/>
                             </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Button.Style>
             </Button>
         </DataTemplate>
-        <DataTemplate x:Key="DataTemplateLevel1">
-            <ItemsControl ItemsSource="{Binding }" ItemTemplate="{DynamicResource DataTemplateLevel2}">
+
+        <DataTemplate x:Key="RowDataTemplate">
+            <ItemsControl Name="RowPresenter" ItemsSource="{Binding }" ItemTemplate="{DynamicResource InProgressCellTemplate}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
+            <DataTemplate.Triggers>
+                <DataTrigger Value="2" Binding="{Binding DataContext.State,  RelativeSource={RelativeSource AncestorType=app:MainWindow}}">
+                    <Setter TargetName="RowPresenter" Property="ItemTemplate" Value="{DynamicResource EndGameCellTemplate}" />
+                </DataTrigger>
+                <DataTrigger Value="3" Binding="{Binding DataContext.State,  RelativeSource={RelativeSource AncestorType=app:MainWindow}}">
+                    <Setter TargetName="RowPresenter" Property="ItemTemplate" Value="{DynamicResource EndGameCellTemplate}" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
+
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="Foreground" Value="LawnGreen" />
+            <Setter Property="Background" Value="Black" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Foreground" Value="LawnGreen" />
+            <Setter Property="Background" Value="Black" />
+        </Style>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Foreground" Value="LawnGreen" />
+            <Setter Property="Background" Value="Black" />
+        </Style>
+
     </Window.Resources>
     <Grid Margin="25,5,25,25">
         <Grid.RowDefinitions>
@@ -125,21 +217,35 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Margin="2,0" Orientation="Horizontal">
+            <StackPanel Grid.Column="0" Margin="2,0" Orientation="Horizontal" >
                 <ComboBox Height="20" ItemsSource="{Binding DifficultyTiers}" SelectedItem="{Binding SelectedDifficulty}"/>
-                <Label Content="Columns:" Background="Black" Foreground="LawnGreen"/>
-                <TextBox VerticalAlignment="Center" Text="{Binding NumberOfColumns}" Background="Black" Foreground="LawnGreen"/>
-                <Label Content="Rows:" Background="Black" Foreground="LawnGreen"/>
-                <TextBox VerticalAlignment="Center" Text="{Binding NumberOfRows}" Background="Black" Foreground="LawnGreen"/>
-                <Label Content="Mines:" Background="Black" Foreground="LawnGreen"/>
-                <TextBox VerticalAlignment="Center" Text="{Binding NumberOfMines}" Background="Black" Foreground="LawnGreen"/>
+                <Label Content="Columns:"/>
+                <TextBox VerticalAlignment="Center" Text="{Binding NumberOfColumns}"/>
+                <Label Content="Rows:"/>
+                <TextBox VerticalAlignment="Center" Text="{Binding NumberOfRows}"/>
+                <Label Content="Mines:"/>
+                <TextBox VerticalAlignment="Center" Text="{Binding NumberOfMines}"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="2,0">
-                <Label HorizontalAlignment="Right" Content="{Binding MessageContent}" Foreground="LawnGreen"/>
-                <Button HorizontalAlignment="Right" Background="Black" Foreground="LawnGreen" Padding="5,0" Content="New Game" Command="{Binding NewGameCommand}"/>
+                <Label HorizontalAlignment="Right" Content="{Binding MessageContent}">
+                    <Label.Style>
+                        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource {x:Type Label}}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding State}" Value="2">
+                                    <Setter Property="TextElement.FontWeight" Value="Bold"/>
+                                    <Setter Property="TextElement.Foreground" Value="Red"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding State}" Value="3">
+                                    <Setter Property="TextElement.FontWeight" Value="Bold"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Label.Style>
+                </Label>
+                <Button HorizontalAlignment="Right" Padding="5,0" Content="New Game" Command="{Binding NewGameCommand}"/>
             </StackPanel>
         </Grid>
         
-        <ItemsControl Margin="2" Grid.Row="1" ItemsSource="{Binding Cells}" ItemTemplate="{DynamicResource DataTemplateLevel1}"/>
+        <ItemsControl Margin="2" Grid.Row="1" ItemsSource="{Binding Cells}" ItemTemplate="{DynamicResource RowDataTemplate}"/>
     </Grid>
 </Window>

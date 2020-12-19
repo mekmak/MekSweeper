@@ -39,8 +39,7 @@ namespace MekSweeper.UI.App
 
             SelectedDifficulty = DifficultyTier.Hard;
 
-            _gameState = GameState.NotStarted;
-
+            State = GameState.NotStarted;
             NewGame();
         }
 
@@ -80,6 +79,11 @@ namespace MekSweeper.UI.App
         #region Properties
 
         private GameState _gameState;
+        public GameState State
+        {
+            get => _gameState;
+            set => SetProperty(nameof(State), ref _gameState, ref value);
+        }
 
         private DifficultyTier _selectedDifficulty;
         public DifficultyTier SelectedDifficulty
@@ -219,14 +223,14 @@ namespace MekSweeper.UI.App
             }
             catch (Exception ex)
             {
-                _gameState = GameState.NotStarted;
+                State = GameState.NotStarted;
                 MessageContent = $"Game setup issue: {ex.ShortSummary()}";
                 return;
             }
 
             Cells = cells;
 
-            _gameState = GameState.InProgress;
+            State = GameState.InProgress;
             UpdateGameState();
         }
 
@@ -265,7 +269,7 @@ namespace MekSweeper.UI.App
 
         private void RevealKnown(object cellObj)
         {
-            if (_gameState != GameState.InProgress)
+            if (State != GameState.InProgress)
             {
                 return;
             }
@@ -302,7 +306,7 @@ namespace MekSweeper.UI.App
 
         private void FlagCell(object cellObj)
         {
-            if (_gameState != GameState.InProgress)
+            if (State != GameState.InProgress)
             {
                 return;
             }
@@ -339,7 +343,7 @@ namespace MekSweeper.UI.App
 
         private void UncoverCell(object cellObj)
         {
-            if (_gameState != GameState.InProgress)
+            if (State != GameState.InProgress)
             {
                 return;
             }
@@ -366,13 +370,14 @@ namespace MekSweeper.UI.App
                 return false;
             }
 
+            cell.FlagState = CellFlagState.Uncovered;
+
             if (cell.IsMine)
             {
                 EndGame(GameState.Lost);
                 return true;
             }
 
-            cell.FlagState = CellFlagState.Uncovered;
             if (cell.NeighboringMineCount == 0)
             {
                 ChainUncoverZeroCells(cell);
@@ -449,11 +454,11 @@ namespace MekSweeper.UI.App
         {
             _logger.Info(_traceId, "EndGame", ("endState", endState));
 
-            _gameState = endState;
-            foreach (CellModel cell in _cells.SelectMany(c => c))
+            State = endState;
+            /*foreach (CellModel cell in _cells.SelectMany(c => c))
             {
                 cell.FlagState = CellFlagState.Uncovered;
-            }
+            }*/
 
             OnPropertyChanged(nameof(Cells));
 
@@ -472,7 +477,7 @@ namespace MekSweeper.UI.App
             }
         }
 
-        private enum GameState
+        public enum GameState
         {
             NotStarted,
             InProgress,

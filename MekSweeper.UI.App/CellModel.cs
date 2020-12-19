@@ -21,10 +21,10 @@ namespace MekSweeper.UI.App
         public CellFlagState FlagState
         {
             get => _flagState;
-            set => SetProperty(nameof(FlagState), ref _flagState, ref value, nameof(Display));
+            set => SetProperty(nameof(FlagState), ref _flagState, ref value, nameof(InProgressDisplay), nameof(EndGameDisplay));
         }
 
-        public string Display
+        public string InProgressDisplay
         {
             get
             {
@@ -33,11 +33,34 @@ namespace MekSweeper.UI.App
                     case CellFlagState.Blank:
                         return "";
                     case CellFlagState.Flagged:
-                        return "F";
+                        return "M";
                     case CellFlagState.Uncovered when NeighboringMineCount != 0:
-                        return IsMine ? "X" : NeighboringMineCount.ToString();
+                        return NeighboringMineCount.ToString();
                     case CellFlagState.Uncovered when NeighboringMineCount == 0:
-                        return IsMine ? "X" : "";
+                        return "";
+                    default:
+                        return "?";
+                }
+            }
+        }
+
+        public string EndGameDisplay
+        {
+            get
+            {
+                switch (FlagState)
+                {
+                    case CellFlagState.Flagged when IsMine:
+                        return "M";
+                    case CellFlagState.Flagged when !IsMine:
+                        return $"{NeighboringMineCount}!";
+                    case CellFlagState.Uncovered when IsMine:
+                        return "X!";
+                    case CellFlagState.Blank when !IsMine:
+                    case CellFlagState.Uncovered when !IsMine:
+                        return NeighboringMineCount == 0 ? "" : NeighboringMineCount.ToString();
+                    case CellFlagState.Blank when IsMine:
+                        return "X";
                     default:
                         return "?";
                 }
@@ -51,7 +74,7 @@ namespace MekSweeper.UI.App
             yield return ("isMine", IsMine);
             yield return ("neighborMineCount", NeighboringMineCount);
             yield return ("flagState", _flagState);
-            yield return ("display", Display);
+            yield return ("display", InProgressDisplay);
         }
 
         public override string ToString()
