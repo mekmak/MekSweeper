@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using MekSweeper.Extensions;
 using MekSweeper.Game;
 using MekSweeper.Logging;
@@ -18,6 +19,17 @@ namespace MekSweeper.UI.App
         {
             _logger = new MekLogger("MekSweeper");
             _traceId = TraceId.New();
+
+            try
+            {
+                var version = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "";
+                Title = $"MekSweeper {version}";
+            }
+            catch
+            {
+                Title = "MekSweeper";
+            }
+
 
             _logger.Info(_traceId, "AppLaunched");
 
@@ -77,6 +89,13 @@ namespace MekSweeper.UI.App
         #endregion
 
         #region Properties
+
+        private string _title;
+        public string Title
+        {
+            get => _title;
+            set => SetProperty(nameof(Title), ref _title, ref value);
+        }
 
         private GameState _gameState;
         public GameState State

@@ -6,7 +6,8 @@
         xmlns:app="clr-namespace:MekSweeper.UI.App"
         d:DataContext="local:MainWindowViewModel"
         mc:Ignorable="d" Background="Black"
-        Title="MekSweeper" Width="Auto" Height="Auto" SizeToContent="WidthAndHeight">
+        Title="{Binding Title}" 
+        Width="Auto" Height="Auto" SizeToContent="WidthAndHeight">
     <Window.Resources>
 
         <DataTemplate x:Key="EndGameCellTemplate">
