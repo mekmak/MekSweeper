@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using MekSweeper.Game;
 
 namespace MekSweeper.UI.App
 {
@@ -11,13 +13,12 @@ namespace MekSweeper.UI.App
 
     public class CellModel : ObservableObject
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int ColumnNumber { get; set; }
+        public int RowNumber { get; set; }
         public bool IsMine { get; set; }
         public int NeighboringMineCount { get; set; }
 
         private CellFlagState _flagState;
-
         public CellFlagState FlagState
         {
             get => _flagState;
@@ -67,10 +68,89 @@ namespace MekSweeper.UI.App
             }
         }
 
+        public static CellModel FromCell(int col, int row, Cell cell)
+        {
+            switch (cell)
+            {
+                case MineCell:
+                {
+                    return new CellModel
+                    {
+                        FlagState = TranslateState(cell.State),
+                        IsMine = true,
+                        NeighboringMineCount = 0,
+                        ColumnNumber = col,
+                        RowNumber = row
+                    };
+                }
+
+                case EmptyCell empty:
+                {
+                    return new CellModel
+                    {
+                        FlagState = TranslateState(cell.State),
+                        IsMine = false,
+                        NeighboringMineCount = empty.NeighboringMineCount,
+                        ColumnNumber = col,
+                        RowNumber = row
+                    };
+                }
+            }
+
+            throw new InvalidOperationException($"Unrecognized cell type '{cell.GetType().Name}'");
+        }
+
+        private static CellFlagState TranslateState(CellState cellState)
+        {
+            switch (cellState)
+            {
+                case CellState.Uncovered:
+                    return CellFlagState.Uncovered;
+                case CellState.Blank:
+                    return CellFlagState.Blank;
+                case CellState.Flagged:
+                    return CellFlagState.Flagged;
+                default:
+                    throw new InvalidOperationException($"Unrecognized cell state '{cellState}'");
+            }
+        }
+
+        public Cell ToCell()
+        {
+            if (IsMine)
+            {
+                return new MineCell
+                {
+                    State = TranslateState(FlagState)
+                };
+            }
+
+            return new EmptyCell
+            {
+                State = TranslateState(FlagState),
+                NeighboringMineCount = NeighboringMineCount
+            };
+        }
+
+        private CellState TranslateState(CellFlagState cellState)
+        {
+            switch (cellState)
+            {
+                case CellFlagState.Uncovered:
+                    return CellState.Uncovered;
+                case CellFlagState.Blank:
+                    return CellState.Blank;
+                case CellFlagState.Flagged:
+                    return CellState.Flagged;
+                default:
+                    throw new InvalidOperationException($"Unrecognized cell flag state '{cellState}'");
+            }
+        }
+
         public IEnumerable<(string, object)> LogTags()
         {
-            yield return ("x", X);
-            yield return ("y", Y);
+            yield return ("colNum", ColumnNumber);
+            yield return ("rowNum", RowNumber);
             yield return ("isMine", IsMine);
             yield return ("neighborMineCount", NeighboringMineCount);
             yield return ("flagState", _flagState);
@@ -79,7 +159,9 @@ namespace MekSweeper.UI.App
 
         public override string ToString()
         {
-            return $"({X},{Y}) {(IsMine ? "X" : NeighboringMineCount.ToString())} {FlagState}";
+            return $"({ColumnNumber},{RowNumber}) {(IsMine ? "X" : NeighboringMineCount.ToString())} {FlagState}";
         }
+
+
     }
 }

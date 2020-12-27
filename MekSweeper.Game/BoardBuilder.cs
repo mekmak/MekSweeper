@@ -13,7 +13,7 @@ namespace MekSweeper.Game
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public Cell[,] Build(string traceId, BoardOptions options)
+        public Board Build(string traceId, BoardOptions options)
         {
             if (options == null)
             {
@@ -56,20 +56,28 @@ namespace MekSweeper.Game
                 {
                     if (mines[x, y])
                     {
-                        cells[x, y] = new MineCell();
+                        cells[x, y] = new MineCell
+                        {
+                            State = CellState.Blank
+                        };
                     }
                     else
                     {
                         int neighborMineCount = GetNeighboringMineCount(x, y, mines);
                         cells[x, y] = new EmptyCell
                         {
+                            State = CellState.Blank,
                             NeighboringMineCount = neighborMineCount
                         };
                     }
                 }
             }
 
-            return cells;
+            return new Board
+            {
+                Cells = cells,
+                Options = options
+            };
         }
 
         private int GetNeighboringMineCount(int col, int row, bool[,] mines)

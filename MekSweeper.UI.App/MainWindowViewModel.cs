@@ -13,6 +13,7 @@ namespace MekSweeper.UI.App
     {
         private readonly string _traceId;
         private readonly BoardBuilder _boardBuilder;
+        private readonly BoardSolver _boardSolver;
         private readonly IMekLogger _logger;
 
         public MainWindowViewModel()
@@ -34,6 +35,7 @@ namespace MekSweeper.UI.App
             _logger.Info(_traceId, "AppLaunched");
 
             _boardBuilder = new BoardBuilder(_logger.SubLogger("BoardBuilder"));
+            _boardSolver = new BoardSolver(_logger.SubLogger("BoardSolver"));
             _cells = new List<List<CellModel>>();
 
             NewGameCommand = new Command(NewGame);
@@ -157,11 +159,19 @@ namespace MekSweeper.UI.App
             set => SetProperty(nameof(MessageContent), ref _messageContent, ref value);
         }
 
+        private BoardOptions _currentBoardOptions;
         private List<List<CellModel>> _cells;
         public List<List<CellModel>> Cells
         {
             get => _cells;
             set => SetProperty(nameof(Cells), ref _cells, ref value);
+        }
+
+        private bool _hasMove;
+        public bool HasMove
+        {
+            get => _hasMove;
+            set => SetProperty(nameof(HasMove), ref _hasMove, ref value);
         }
 
         #endregion
@@ -227,16 +237,16 @@ namespace MekSweeper.UI.App
             List<List<CellModel>> cells;
             try
             {
-                Cell[,] newBoard = _boardBuilder.Build(_traceId, options);
+                Board newBoard = _boardBuilder.Build(_traceId, options);
 
                 cells = new List<List<CellModel>>(options.ColumnCount);
-                for (int x = 0; x < options.ColumnCount; x++)
+                for (int col = 0; col < options.ColumnCount; col++)
                 {
                     cells.Add(new List<CellModel>(options.RowCount));
-                    for (int y = 0; y < options.RowCount; y++)
+                    for (int row = 0; row < options.RowCount; row++)
                     {
-                        Cell cell = newBoard[x, y];
-                        cells[x].Add(FromCell(x, y, cell));
+                        Cell cell = newBoard.Cells[col, row];
+                        cells[col].Add(CellModel.FromCell(col, row, cell));
                     }
                 }
             }
@@ -248,42 +258,10 @@ namespace MekSweeper.UI.App
             }
 
             Cells = cells;
+            _currentBoardOptions = options;
 
             State = GameState.InProgress;
             UpdateGameState();
-        }
-
-        private CellModel FromCell(int x, int y, Cell cell)
-        {
-            switch (cell)
-            {
-                case MineCell:
-                {
-                    return new CellModel
-                    {
-                        FlagState = CellFlagState.Blank,
-                        IsMine = true,
-                        NeighboringMineCount = 0,
-                        X = x,
-                        Y = y
-                    };
-                }
-
-                case EmptyCell empty:
-                {
-                    return new CellModel
-                    {
-                        FlagState = CellFlagState.Blank,
-                        IsMine = false,
-                        NeighboringMineCount = empty.NeighboringMineCount,
-                        X = x,
-                        Y = y
-                    };
-                }
-            }
-
-            _logger.Warn(_traceId, "FromCell.UnrecognizedCellType", ("cellType", cell.GetType().Name));
-            throw new InvalidOperationException($"Unrecognized cell type '{cell.GetType().Name}'");
         }
 
         private void RevealKnown(object cellObj)
@@ -305,7 +283,7 @@ namespace MekSweeper.UI.App
                 return;
             }
 
-            List<CellModel> neighbors = _cells.GetNeighbors(cell.X, cell.Y).ToList();
+            List<CellModel> neighbors = _cells.GetNeighbors(cell.ColumnNumber, cell.RowNumber).ToList();
             List<CellModel> flagged = neighbors.Where(n => n.FlagState == CellFlagState.Flagged).ToList();
             List<CellModel> unrevealed = neighbors.Where(n => n.FlagState == CellFlagState.Blank).ToList();
 
@@ -402,7 +380,7 @@ namespace MekSweeper.UI.App
                 ChainUncoverZeroCells(cell);
             }
 
-            return UpdateGameState();;
+            return UpdateGameState();
         }
 
         private void ChainUncoverZeroCells(CellModel cell)
@@ -413,7 +391,7 @@ namespace MekSweeper.UI.App
             while (cellsToUncover.Count > 0)
             {
                 CellModel currentCell = cellsToUncover.Dequeue();
-                List<CellModel> neighbors = _cells.GetNeighbors(currentCell.X, currentCell.Y).ToList();
+                List<CellModel> neighbors = _cells.GetNeighbors(currentCell.ColumnNumber, currentCell.RowNumber).ToList();
                 foreach (var neighbor in neighbors)
                 {
                     if (neighbor.FlagState == CellFlagState.Uncovered)
@@ -465,8 +443,29 @@ namespace MekSweeper.UI.App
                 return true;
             }
 
+            HasMove = _boardSolver.HasMove(_traceId, GetBoardCopy());
             MessageContent = $"Mines left: {totalMineCount - totalFlaggedCount}";
             return false;
+        }
+
+        private Board GetBoardCopy()
+        {
+            var cells = new Cell[_currentBoardOptions.ColumnCount, _currentBoardOptions.RowCount];
+            for (int col = 0; col < Cells.Count; col++)
+            {
+                var rows = Cells[col];
+                for (int row = 0; row < rows.Count; row++)
+                {
+                    CellModel cellModel = rows[row];
+                    cells[col, row] = cellModel.ToCell();
+                }
+            }
+
+            return new Board
+            {
+                Options = _currentBoardOptions,
+                Cells = cells
+            };
         }
 
         private void EndGame(GameState endState)
@@ -474,12 +473,7 @@ namespace MekSweeper.UI.App
             _logger.Info(_traceId, "EndGame", ("endState", endState));
 
             State = endState;
-            /*foreach (CellModel cell in _cells.SelectMany(c => c))
-            {
-                cell.FlagState = CellFlagState.Uncovered;
-            }*/
-
-            OnPropertyChanged(nameof(Cells));
+            HasMove = false;
 
             switch (endState)
             {
