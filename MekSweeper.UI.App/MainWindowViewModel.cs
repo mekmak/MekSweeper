@@ -12,6 +12,7 @@ namespace MekSweeper.UI.App
     public class MainWindowViewModel : ObservableObject
     {
         private readonly string _traceId;
+        private readonly DialogController _dialogController;
         private readonly BoardBuilder _boardBuilder;
         private readonly BoardSolver _boardSolver;
         private readonly IMekLogger _logger;
@@ -36,9 +37,11 @@ namespace MekSweeper.UI.App
 
             _boardBuilder = new BoardBuilder(_logger.SubLogger("BoardBuilder"));
             _boardSolver = new BoardSolver(_logger.SubLogger("BoardSolver"));
+            _dialogController = new DialogController();
+
             _cells = new List<List<CellModel>>();
 
-            NewGameCommand = new Command(NewGame);
+            NewGameCommand = new Command(OnNewGame);
             UncoverCellCommand = new Command(UncoverCell);
             FlagCellCommand = new Command(FlagCell);
             RevealKnownCommand = new Command(RevealKnown);
@@ -220,6 +223,11 @@ namespace MekSweeper.UI.App
         private void OnNumberOfRowsChanged()
         {
             SelectedDifficulty = DifficultyTier.Custom;
+        }
+
+        private void OnNewGame()
+        {
+            _dialogController.AskYesNo("New game", "Are you sure you want to start a new game?", NewGame, () => { });
         }
 
         private void NewGame()
@@ -467,7 +475,7 @@ namespace MekSweeper.UI.App
                 Cells = cells
             };
         }
-
+        
         private void EndGame(GameState endState)
         {
             _logger.Info(_traceId, "EndGame", ("endState", endState));
